@@ -1,22 +1,25 @@
 import random
 import numpy as np
+from collections import namedtuple, deque
 
-class ReplayBuffer:
-    def __init__(self, capacity):
-        self.capacity = capacity
-        self.buffer = []
-        self.position = 0
+Transition = namedtuple('Transition',
+                        ('state', 'action', 'next_state', 'reward'))
 
-    def push(self, state, action, reward, next_state, done):
-        if len(self.buffer) < self.capacity:
-            self.buffer.append(None)
-        self.buffer[self.position] = (state, action, reward, next_state, done)
-        self.position = (self.position + 1) % self.capacity
+class Buffer:
+    def __init__(self, size: int):
+        assert size > 0
+        self.buffer = deque([], maxlen=size)
+        self.maxlen = size
+    
+    def push(self, *args):
+        self.buffer.append(Transition(*args))
 
     def sample(self, batch_size):
-        batch = random.sample(self.buffer, batch_size)
-        state, action, reward, next_state, done = map(np.stack, zip(*batch))
-        return state, action, reward, next_state, done
+        return random.sample(self.buffer, batch_size)
+    
+    def is_full(self):
+        return self.maxlen == len(self.buffer)
 
     def __len__(self):
         return len(self.buffer)
+

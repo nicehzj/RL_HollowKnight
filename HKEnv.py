@@ -116,13 +116,14 @@ class HollowKnightEnv(gym.Env):
             window.maximize()
             window.restore()
         window.moveTo(0, 0)
-
+        
         geo = None
-        conf = 0.9995
+        conf = 0.95
         while geo is None:
-            geo = pyautogui.locateOnScreen('.locator/geo.png', confidence=conf)
+            geo = pyautogui.locateOnScreen('locator/geo.png', confidence=conf, grayscale=True, region=(0, 0, 250, 250))
             conf = max(0.92, conf*0.999)
             time.sleep(0.1)
+
         loc = {
             'left': geo.left - 36,
             'top': geo.top - 97,
@@ -142,3 +143,12 @@ class HollowKnightEnv(gym.Env):
     def render(self):
         # Implement this method if needed
         pass
+
+
+if __name__ == '__main__':
+    env = HollowKnightEnv()
+    loc = env._find_window()
+    print(loc)
+    pyautogui.moveTo(loc['left'], loc['top'])
+    # pyautogui.moveTo(loc['left'] + loc['width'], loc['top'])
+    pyautogui.moveTo
